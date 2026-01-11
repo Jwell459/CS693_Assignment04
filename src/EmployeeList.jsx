@@ -1,19 +1,17 @@
+import React from 'react'
 import EmployeeFilter from './EmployeeFilter.jsx'
 import EmployeeAdd from './EmployeeAdd.jsx'
 
 function EmployeeTable(props) {
     const employeeRows = props.employees.map(employee =>
         <EmployeeRow
-            key={employee.id}
+            key={employee._id}
             employee={employee}
-            deleteEmployee={props.deleteEmployee}
-        />)
-
+            deleteEmployee={props.deleteEmployee} />)
     return (
         <table className="bordered-table">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Extension</th>
                     <th>Email</th>
@@ -31,19 +29,17 @@ function EmployeeTable(props) {
 }
 
 function EmployeeRow(props) {
-    const employee = props.employee
     function onDeleteClick() {
-        props.deleteEmployee(props.employee_id)
+        props.deleteEmployee(props.employee._id)
     }
     return (
         <tr>
-            <td>{props.employee.id}</td>
             <td>{props.employee.name}</td>
-            <td>{props.employee.ext}</td>
+            <td>{props.employee.extension}</td>
             <td>{props.employee.email}</td>
             <td>{props.employee.title}</td>
             <td>{props.employee.dateHired.toDateString()}</td>
-            <td>{props.employee.isEmployed ? 'Yes' : 'No'}</td>
+            <td>{props.employee.currentlyEmployed ? 'Yes' : 'No'}</td>
             <td><button onClick={onDeleteClick}>DELETE</button></td>
         </tr>
     )
@@ -69,24 +65,24 @@ export default class EmployeeList extends React.Component {
                 })
                 this.setState({ employees: data.employees })
             })
-            .catch(err => { copnsole.log(err) })
+            .catch(err => { console.log(err) })
     }
     createEmployee(employee) {
         fetch('/api/employees', {
             method: 'POST',
-            headers: { 'ContentType': 'application/json' },
-            body: JSON.stringify(employee)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(employee),
         })
             .then(response => response.json())
             .then(newEmployee => {
                 newEmployee.employee.dateHired = new Date(newEmployee.employee.dateHired)
-                const newEmployees = this.state.employees.concate(newEmployees.employee)
+                const newEmployees = this.state.employees.concat(newEmployee.employee)
                 this.setState({ employees: newEmployees })
                 console.log('Total count of employees:', newEmployees.length)
             })
             .catch(err => { console.log(err) })
     }
-    deleteEmployee() {
+    deleteEmployee(id) {
         fetch(`/api/employees/${id}`, { method: 'DELETE' })
             .then(response => {
                 if (!response.ok) {
@@ -102,7 +98,7 @@ export default class EmployeeList extends React.Component {
                 <h1>Employee Management Application</h1>
                 <EmployeeFilter />
                 <hr />
-                <EmployeeTable employees={this.state.employees} />
+                <EmployeeTable employees={this.state.employees} deleteEmployee={this.deleteEmployee} />
                 <hr />
                 <EmployeeAdd createEmployee={this.createEmployee} />
             </React.Fragment>

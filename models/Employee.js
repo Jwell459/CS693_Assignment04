@@ -1,4 +1,6 @@
-const EmployeesSchema = new mongoos.Schema({
+import mongoose from 'mongoose'
+
+const EmployeesSchema = new mongoose.Schema({
     name: {
         type: String,
         rquired: [true, 'Name required']
@@ -24,3 +26,5 @@ const EmployeesSchema = new mongoos.Schema({
         defualt: true
     },
 })
+
+export default mongoose.model('Employee', EmployeesSchema)
